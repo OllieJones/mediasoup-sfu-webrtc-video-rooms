@@ -1,20 +1,23 @@
 require('dotenv').config()
 const os = require('os')
 
-console.log (process.env.HTTPS_CERT_FULLCHAIN, process.env.HTTPS_CERT_PRIVKEY)
+
+const rtcMinPort = process.env.RTC_MIN_PORT || 10000
+const rtcPortCount = process.env.RTC_PORT_COUNT || 10
 
 module.exports = {
     listenIp: process.env.MEDIASOUP_LISTEN_IP || '0.0.0.0',
     listenPort: process.env.PORT || 3016,
-    sslCrt: process.env.HTTPS_CERT_FULLCHAIN ||'../ssl/cert.pem',
+    useProxy: (process.env.USE_PROXY && process.env.USE_PROXY === 'true') || false,
+    sslCrt: process.env.HTTPS_CERT_FULLCHAIN || '../ssl/cert.pem',
     sslKey: process.env.HTTPS_CERT_PRIVKEY || '../ssl/key.pem',
     
     mediasoup: {
       // Worker settings
-      numWorkers : Object.keys(os.cpus()).length,
+      numWorkers : Object.keys(os.cpus()).length - 1,
       worker: {
-        rtcMinPort: 10000,
-        rtcMaxPort: 10100,
+        rtcMinPort: rtcMinPort,
+        rtcMaxPort: rtcMinPort + rtcPortCount,
         logLevel: 'warn',
         logTags: [
           'info',
